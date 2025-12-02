@@ -2,12 +2,12 @@ import { z, ZodType } from "zod"
 
 export class UserValidation {
     static readonly REGISTER: ZodType = z.object({
-        fullName: z
+        username: z
             .string({
-                error: "Name must only contain alphabet character!",
+                error: "Username must be string!",
             })
             .min(1, {
-                error: "Name can not be empty!",
+                error: "Username can not be empty!",
             }),
         email: z
             .email({
@@ -40,10 +40,5 @@ export class UserValidation {
             .min(8, {
                 error: "Password must contain more than or equal to 8 characters!",
             }),
-    })
-
-    static readonly UPDATE: ZodType = z.object({
-        about: z.string().optional(),
-        fullName: z.string().optional()
     })
 }

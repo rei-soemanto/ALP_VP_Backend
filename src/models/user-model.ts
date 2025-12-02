@@ -3,12 +3,12 @@ import { generateToken } from "../utils/jwt-util"
 
 export interface UserJWTPayload {
     id: number
-    username: string
+    fullName: string
     email: string
 }
 
 export interface RegisterUserRequest {
-    username: string
+    fullName: string
     email: string
     password: string
 }
@@ -18,23 +18,40 @@ export interface LoginUserRequest {
     password: string
 }
 
+export interface UpdateUserRequest {
+    fullName?: string
+    about?: string
+}
+
 export interface UserResponse {
     token?: string
+    fullName?: string
+    email?: string
+    about?: string
 }
 
 export function toUserResponse(
     id: number,
-    username: string,
-    email: string
+    fullName: string,
+    email: string,
+    about?: string | null
 ): UserResponse {
-    return {
+    const response: UserResponse = {
         token: generateToken(
             {
                 id: id,
-                username: username,
+                fullName: fullName,
                 email: email,
             },
             "1h"
         ),
+        fullName: fullName,
+        email: email,
     }
+
+    if (about) {
+        response.about = about;
+    }
+
+    return response;
 }

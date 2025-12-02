@@ -14,6 +14,7 @@ export const authMiddleware = (
 
         if (!token) {
             next(new ResponseError(401, "Unauthorized user!"))
+            return
         }
 
         const payload = verifyToken(token!)
@@ -22,6 +23,7 @@ export const authMiddleware = (
             req.user = payload
         } else {
             next(new ResponseError(401, "Unauthorized user!"))
+            return
         }
 
         next()

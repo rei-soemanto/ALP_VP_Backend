@@ -2,8 +2,10 @@ import { ResponseError } from "../error/response-error"
 import {
     LoginUserRequest,
     RegisterUserRequest,
+    UpdateUserRequest,
     toUserResponse,
     UserResponse,
+    UserJWTPayload,
 } from "../models/user-model"
 import { prismaClient } from "../utils/database-util"
 import { UserValidation } from "../validations/user-validation"
@@ -31,13 +33,13 @@ export class UserService {
 
         const user = await prismaClient.user.create({
             data: {
-                username: validatedData.username,
+                fullName: validatedData.fullName,
                 email: validatedData.email,
                 password: validatedData.password,
             },
         })
 
-        return toUserResponse(user.id, user.username, user.email)
+        return toUserResponse(user.id, user.fullName, user.email, user.about)
     }
 
     static async login(request: LoginUserRequest): Promise<UserResponse> {
@@ -62,6 +64,38 @@ export class UserService {
             throw new ResponseError(400, "Invalid email or password!")
         }
 
-        return toUserResponse(user.id, user.username, user.email)
+        return toUserResponse(user.id, user.fullName, user.email, user.about)
+    }
+
+    static async update(
+        userPayload: UserJWTPayload, 
+        request: UpdateUserRequest
+    ): Promise<UserResponse> {
+        const validatedData = Validation.validate(
+            UserValidation.UPDATE, 
+            request
+        )
+
+        const userExists = await prismaClient.user.findUnique({
+            where: { id: userPayload.id }
+        })
+
+        if(!userExists) {
+            throw new ResponseError(404, "User not found")
+        }
+
+        const updatedUser = await prismaClient.user.update({
+            where: {
+                id: userPayload.id
+            },
+            data: validatedData
+        })
+
+        return toUserResponse(
+            updatedUser.id, 
+            updatedUser.fullName, 
+            updatedUser.email, 
+            updatedUser.about
+        )
     }
 }

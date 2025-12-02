@@ -15,10 +15,12 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @db.VarChar(100)
-  email    String @unique @db.VarChar(150)
-  password String @db.VarChar(100)
+  id          Int     @id @default(autoincrement())
+  fullName    String  @db.VarChar(100)
+  email       String  @unique @db.VarChar(150)
+  password    String  @db.VarChar(100)
+  about       String? @db.Text
+  is_verified Boolean @default(false)
 
   @@map("users")
 }

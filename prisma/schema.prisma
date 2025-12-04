@@ -40,8 +40,8 @@ model UserInterest {
   interestId Int     @map("interest_id")
   isPrimary  Boolean @default(false) @map("primary")
 
-  user     User     @relation(fields: [userId], references: [id])
-  interest Interest @relation(fields: [interestId], references: [id])
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interest Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
 
   @@id([userId, interestId])
   @@map("users_interests")

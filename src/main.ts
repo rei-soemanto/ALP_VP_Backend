@@ -4,12 +4,13 @@ import { publicRouter } from "./routes/public-api";
 import { errorMiddleware } from "./middlewares/error-middleware";
 import { privateRouter } from "./routes/private-api";
 
-const app = express()
+export const app = express()
 
 app.use(express.json())
 app.use("/api", publicRouter)
 app.use("/api", privateRouter)
 app.use(errorMiddleware)
+app.use("/images", express.static("images"))
 
 app.listen(PORT || 3000, () => {
     console.log(`Connected to port ${PORT}`);

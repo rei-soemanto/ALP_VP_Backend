@@ -19,13 +19,13 @@ export class UserService {
             request
         )
 
-        const email = await prismaClient.user.findFirst({
+        const existingUser = await prismaClient.user.findFirst({
             where: {
                 email: validatedData.email,
             },
         })
 
-        if (email) {
+        if (existingUser) {
             throw new ResponseError(400, "Email has already existed!")
         }
 
@@ -39,7 +39,7 @@ export class UserService {
             },
         })
 
-        return toUserResponse(user.id, user.fullName, user.email, user.about)
+        return toUserResponse(user)
     }
 
     static async login(request: LoginUserRequest): Promise<UserResponse> {
@@ -64,7 +64,7 @@ export class UserService {
             throw new ResponseError(400, "Invalid email or password!")
         }
 
-        return toUserResponse(user.id, user.fullName, user.email, user.about)
+        return toUserResponse(user)
     }
 
     static async update(
@@ -91,11 +91,27 @@ export class UserService {
             data: validatedData
         })
 
-        return toUserResponse(
-            updatedUser.id, 
-            updatedUser.fullName, 
-            updatedUser.email, 
-            updatedUser.about
-        )
+        return toUserResponse(updatedUser)
+    }
+    
+    static async get(user: UserJWTPayload): Promise<UserResponse> {
+        const userData = await prismaClient.user.findUnique({
+            where: { id: user.id },
+            include: {
+                _count: {
+                    select: {
+                        posts: true,
+                        followers: true,
+                        following: true
+                    }
+                }
+            }
+        })
+
+        if (!userData) {
+            throw new ResponseError(404, "User not found")
+        }
+
+        return toUserResponse(userData)
     }
 }

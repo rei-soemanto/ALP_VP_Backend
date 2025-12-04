@@ -23,6 +23,11 @@ model User {
   is_verified Boolean @default(false) @map("verified")
 
   interests   UserInterest[]
+  posts       Post[]
+  likes       Like[]
+  comments    Comment[]
+  following   Follower[] @relation("UserFollowing")
+  followers   Follower[] @relation("UserFollowers")
 
   @@map("users")
 }
@@ -45,4 +50,72 @@ model UserInterest {
 
   @@id([userId, interestId])
   @@map("users_interests")
+}
+
+model Follower {
+  followedById Int  @map("followed_by_id")
+  follower     User @relation("UserFollowing", fields: [followedById], references: [id], onDelete: Cascade)
+
+  followedId   Int  @map("followed_id")
+  following    User @relation("UserFollowers", fields: [followedId], references: [id], onDelete: Cascade)
+
+  @@id([followedById, followedId])
+  @@map("followers")
+}
+
+model Post {
+  id          Int      @id @default(autoincrement())
+  title       String?  @db.VarChar(255)
+  caption     String?  @db.Text
+  isPublic    Boolean  @default(true) @map("public")
+  createdAt   DateTime @default(now()) @map("upload_date")
+
+  userId      Int      @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  images      PostImage[]
+  likes       Like[]
+  comments    Comment[]
+
+  @@map("posts")
+}
+
+model PostImage {
+  id        Int    @id @default(autoincrement())
+  imageUrl  String @map("image_url") @db.VarChar(255)
+  
+  postId    Int    @map("post_id")
+  post      Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("post_images")
+}
+
+model Like {
+  userId Int @map("user_id")
+  postId Int @map("post_id")
+
+  user   User @relation(fields: [userId], references: [id])
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+  @@map("likes")
+}
+
+model Comment {
+  id          Int      @id @default(autoincrement())
+  content     String   @db.Text
+  createdAt   DateTime @default(now()) @map("comment_date")
+
+  userId      Int      @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+
+  postId      Int      @map("post_id")
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  replyingToId Int?     @map("replying_to")
+  replyingTo   Comment? @relation("CommentReplies", fields: [replyingToId], references: [id])
+  
+  replies      Comment[] @relation("CommentReplies")
+
+  @@map("comments")
 }

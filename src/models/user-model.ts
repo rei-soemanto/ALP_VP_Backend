@@ -25,33 +25,38 @@ export interface UpdateUserRequest {
 
 export interface UserResponse {
     token?: string
+    id: number
     fullName?: string
     email?: string
     about?: string
+    postsCount?: number
+    followersCount?: number
+    followingCount?: number
 }
 
-export function toUserResponse(
-    id: number,
-    fullName: string,
-    email: string,
-    about?: string | null
-): UserResponse {
+export function toUserResponse(user: any): UserResponse {
+    const token = generateToken(
+        {
+            id: user.id,
+            fullName: user.fullName,
+            email: user.email,
+        },
+        "24h"
+    )
+
     const response: UserResponse = {
-        token: generateToken(
-            {
-                id: id,
-                fullName: fullName,
-                email: email,
-            },
-            "1h"
-        ),
-        fullName: fullName,
-        email: email,
+        token: token,
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        about: user.about,
+    }
+    
+    if (user._count) {
+        response.postsCount = user._count.posts
+        response.followersCount = user._count.followers
+        response.followingCount = user._count.following
     }
 
-    if (about) {
-        response.about = about;
-    }
-
-    return response;
+    return response
 }

@@ -27,7 +27,6 @@ export class PostService {
 
         const post = await prismaClient.post.create({
             data: {
-                title: validatedRequest.title,
                 caption: validatedRequest.caption,
                 isPublic: validatedRequest.isPublic === "true",
                 userId: user.id,
@@ -43,7 +42,6 @@ export class PostService {
 
         return {
             id: post.id,
-            title: post.title,
             caption: post.caption,
             isPublic: post.isPublic,
             createdAt: post.createdAt,
@@ -78,7 +76,6 @@ export class PostService {
 
         return posts.map((post) => ({
             id: post.id,
-            title: post.title,
             caption: post.caption,
             isPublic: post.isPublic,
             createdAt: post.createdAt,
@@ -110,7 +107,6 @@ export class PostService {
 
         return posts.map((post) => ({
             id: post.id,
-            title: post.title,
             caption: post.caption,
             isPublic: post.isPublic,
             createdAt: post.createdAt,
@@ -151,7 +147,6 @@ export class PostService {
                 id: postId
             },
             data: {
-                title: validatedRequest.title,
                 caption: validatedRequest.caption,
                 isPublic: validatedRequest.isPublic
             },
@@ -170,7 +165,6 @@ export class PostService {
 
         return {
             id: updatedPost.id,
-            title: updatedPost.title,
             caption: updatedPost.caption,
             isPublic: updatedPost.isPublic,
             createdAt: updatedPost.createdAt,

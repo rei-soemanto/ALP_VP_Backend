@@ -65,7 +65,6 @@ model Follower {
 
 model Post {
   id          Int      @id @default(autoincrement())
-  title       String?  @db.VarChar(255)
   caption     String?  @db.Text
   isPublic    Boolean  @default(true) @map("public")
   createdAt   DateTime @default(now()) @map("upload_date")

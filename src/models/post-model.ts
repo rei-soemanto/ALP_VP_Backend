@@ -1,7 +1,6 @@
 import { UserResponse } from "./user-model"
 
 export interface CreatePostRequest {
-    title?: string
     caption?: string
     isPublic?: string
 }
@@ -12,7 +11,6 @@ export interface PostImageResponse {
 
 export interface PostResponse {
     id: number
-    title: string | null
     caption: string | null
     isPublic: boolean
     createdAt: Date
@@ -26,7 +24,6 @@ export interface PostResponse {
 }
 
 export interface UpdatePostRequest {
-    title?: string
     caption?: string
     isPublic?: boolean 
 }

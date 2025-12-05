@@ -5,6 +5,7 @@ import { PostController } from "../controllers/post-controller";
 import { fileUploadMiddleware } from "../middlewares/file-middleware";
 import { UserController } from "../controllers/user-controller";
 import { CommentController } from "../controllers/comment-controller";
+import { profileImageMiddleware } from "../middlewares/file-middleware";
 
 export const privateRouter = express.Router();
 privateRouter.use(authMiddleware);
@@ -14,6 +15,8 @@ privateRouter.post("/users/interests", authMiddleware, InterestController.addInt
 
 privateRouter.get("/users/current", UserController.get);
 privateRouter.get("/posts/mine", PostController.listMine);
+
+privateRouter.patch("/users/current", profileImageMiddleware.single("avatar"), UserController.update);
 
 privateRouter.post("/posts", fileUploadMiddleware.array("images", 5), PostController.create);
 privateRouter.get("/posts", PostController.list);

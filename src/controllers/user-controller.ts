@@ -45,6 +45,12 @@ export class UserController {
     static async update(req: UserRequest, res: Response, next: NextFunction) {
         try {
             const request: UpdateUserRequest = req.body as UpdateUserRequest
+            
+            const file = req.file as Express.Multer.File
+            if (file) {
+                request.avatarUrl = `/images/profiles/${file.filename}`
+            }
+
             const response: UserResponse = await UserService.update(req.user!, request)
 
             res.status(200).json({

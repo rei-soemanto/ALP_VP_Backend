@@ -48,6 +48,7 @@ export class PostService {
             author: {
                 id: post.user.id,
                 fullName: post.user.fullName,
+                avatarUrl: post.user.avatarUrl
             },
             images: post.images.map((img) => ({
                 imageUrl: img.imageUrl,
@@ -88,6 +89,7 @@ export class PostService {
             author: {
                 id: post.user.id,
                 fullName: post.user.fullName,
+                avatarUrl: post.user.avatarUrl
             },
             images: post.images.map((img) => ({ imageUrl: img.imageUrl })),
             totalLikes: post._count.likes,
@@ -123,6 +125,7 @@ export class PostService {
             author: {
                 id: post.user.id,
                 fullName: post.user.fullName,
+                avatarUrl: post.user.avatarUrl
             },
             images: post.images.map((img) => ({ imageUrl: img.imageUrl })),
             totalLikes: post._count.likes,
@@ -184,7 +187,8 @@ export class PostService {
             createdAt: updatedPost.createdAt,
             author: {
                 id: updatedPost.user.id,
-                fullName: updatedPost.user.fullName
+                fullName: updatedPost.user.fullName,
+                avatarUrl: updatedPost.user.avatarUrl
             },
             images: updatedPost.images.map(img => ({
                 imageUrl: img.imageUrl

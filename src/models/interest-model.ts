@@ -7,7 +7,6 @@ export interface InterestResponse {
     name: string
 }
 
-// Request to link user to interests
 export interface AddUserInterestRequest {
     interestId: number
     isPrimary?: boolean

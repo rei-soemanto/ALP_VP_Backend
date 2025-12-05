@@ -20,6 +20,7 @@ model User {
   email       String  @unique @db.VarChar(150)
   password    String  @map("hashed_password") @db.VarChar(100)
   about       String? @db.Text
+  avatarUrl   String? @map("avatar_url") @db.VarChar(255)
   is_verified Boolean @default(false) @map("verified")
 
   interests   UserInterest[]

@@ -12,6 +12,7 @@ export interface CommentResponse {
     author: {
         id: number;
         fullName: string;
+        avatarUrl?: string | null;
     };
     replyingToId: number | null;
     totalReplies: number;

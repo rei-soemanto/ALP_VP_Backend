@@ -17,6 +17,7 @@ export interface PostResponse {
     author: {
         id: number
         fullName: string
+        avatarUrl?: string | null;
     }
     images: { imageUrl: string }[]
     totalLikes: number

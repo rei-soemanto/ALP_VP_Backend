@@ -21,6 +21,7 @@ export interface LoginUserRequest {
 export interface UpdateUserRequest {
     fullName?: string
     about?: string
+    avatarUrl?: string
 }
 
 export interface UserResponse {
@@ -29,6 +30,7 @@ export interface UserResponse {
     fullName?: string
     email?: string
     about?: string
+    avatarUrl?: string
     postsCount?: number
     followersCount?: number
     followingCount?: number
@@ -50,6 +52,7 @@ export function toUserResponse(user: any): UserResponse {
         fullName: user.fullName,
         email: user.email,
         about: user.about,
+        avatarUrl: user.avatarUrl,
     }
     
     if (user._count) {

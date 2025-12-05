@@ -58,7 +58,8 @@ export class CommentService {
             createdAt: comment.createdAt,
             author: {
                 id: comment.user.id,
-                fullName: comment.user.fullName
+                fullName: comment.user.fullName,
+                avatarUrl: comment.user.avatarUrl
             },
             replyingToId: comment.replyingToId,
             totalReplies: 0
@@ -91,7 +92,8 @@ export class CommentService {
             createdAt: comment.createdAt,
             author: {
                 id: comment.user.id,
-                fullName: comment.user.fullName
+                fullName: comment.user.fullName,
+                avatarUrl: comment.user.avatarUrl
             },
             replyingToId: null,
             totalReplies: comment._count.replies,
@@ -101,7 +103,8 @@ export class CommentService {
                 createdAt: reply.createdAt,
                 author: {
                     id: reply.user.id,
-                    fullName: reply.user.fullName
+                    fullName: reply.user.fullName,
+                    avatarUrl: comment.user.avatarUrl
                 },
                 replyingToId: comment.id,
                 totalReplies: reply._count.replies

@@ -8,6 +8,7 @@ import {
     UserJWTPayload,
 } from "../models/user-model"
 import { prismaClient } from "../utils/database-util"
+import { removeFile } from "../utils/file-util"
 import { UserValidation } from "../validations/user-validation"
 import { Validation } from "../validations/validation"
 import bcrypt from "bcrypt"
@@ -76,19 +77,28 @@ export class UserService {
             request
         )
 
-        const userExists = await prismaClient.user.findUnique({
+        const existingUser = await prismaClient.user.findUnique({
             where: { id: userPayload.id }
         })
 
-        if(!userExists) {
+        if(!existingUser) {
             throw new ResponseError(404, "User not found")
+        }
+
+        if (request.avatarUrl && existingUser.avatarUrl) {
+            removeFile(existingUser.avatarUrl)
+        }
+
+        const updateData = {
+            ...validatedData,
+            ...(request.avatarUrl ? { avatarUrl: request.avatarUrl } : {})
         }
 
         const updatedUser = await prismaClient.user.update({
             where: {
                 id: userPayload.id
             },
-            data: validatedData
+            data: updateData
         })
 
         return toUserResponse(updatedUser)

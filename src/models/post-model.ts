@@ -20,6 +20,7 @@ export interface PostResponse {
     }
     images: { imageUrl: string }[]
     totalLikes: number
+    totalComments: number;
     isLiked: boolean
 }
 

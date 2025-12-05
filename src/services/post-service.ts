@@ -53,6 +53,7 @@ export class PostService {
                 imageUrl: img.imageUrl,
             })),
             totalLikes: 0,
+            totalComments: 0,
             isLiked: false
         }
     }
@@ -66,37 +67,11 @@ export class PostService {
             include: {
                 images: true,
                 user: true,
-                _count: { select: { likes: true } },
-                likes: {
-                    where: { userId: user.id },
-                    select: { userId: true }
-                }
-            }
-        })
-
-        return posts.map((post) => ({
-            id: post.id,
-            caption: post.caption,
-            isPublic: post.isPublic,
-            createdAt: post.createdAt,
-            author: {
-                id: post.user.id,
-                fullName: post.user.fullName,
-            },
-            images: post.images.map((img) => ({ imageUrl: img.imageUrl })),
-            totalLikes: post._count.likes,
-            isLiked: post.likes.length > 0
-        }))
-    }
-
-    static async list(user: UserJWTPayload): Promise<PostResponse[]> {
-        const posts = await prismaClient.post.findMany({
-            orderBy: { createdAt: "desc" },
-            include: {
-                images: true,
-                user: true,
-                _count: {
-                    select: { likes: true }
+                _count: { 
+                    select: { 
+                        likes: true, 
+                        comments: true
+                    } 
                 },
                 likes: {
                     where: { userId: user.id },
@@ -116,6 +91,42 @@ export class PostService {
             },
             images: post.images.map((img) => ({ imageUrl: img.imageUrl })),
             totalLikes: post._count.likes,
+            totalComments: post._count.comments,
+            isLiked: post.likes.length > 0
+        }))
+    }
+
+    static async list(user: UserJWTPayload): Promise<PostResponse[]> {
+        const posts = await prismaClient.post.findMany({
+            orderBy: { createdAt: "desc" },
+            include: {
+                images: true,
+                user: true,
+                _count: {
+                    select: { 
+                        likes: true, 
+                        comments: true
+                    }
+                },
+                likes: {
+                    where: { userId: user.id },
+                    select: { userId: true }
+                }
+            }
+        })
+
+        return posts.map((post) => ({
+            id: post.id,
+            caption: post.caption,
+            isPublic: post.isPublic,
+            createdAt: post.createdAt,
+            author: {
+                id: post.user.id,
+                fullName: post.user.fullName,
+            },
+            images: post.images.map((img) => ({ imageUrl: img.imageUrl })),
+            totalLikes: post._count.likes,
+            totalComments: post._count.comments,
             isLiked: post.likes.length > 0
         }))
     }
@@ -154,7 +165,10 @@ export class PostService {
                 images: true,
                 user: true,
                 _count: {
-                    select: { likes: true }
+                    select: { 
+                        likes: true, 
+                        comments: true
+                    }
                 },
                 likes: {
                     where: { userId: user.id },
@@ -176,70 +190,36 @@ export class PostService {
                 imageUrl: img.imageUrl
             })),
             totalLikes: updatedPost._count.likes,
+            totalComments: updatedPost._count.comments,
             isLiked: updatedPost.likes.length > 0
         }
     }
 
     static async delete(user: UserJWTPayload, postId: number) {
         const post = await prismaClient.post.findFirst({
-            where: {
-                id: postId,
-                userId: user.id
-            },
-            include: {
-                images: true
-            }
+            where: { id: postId, userId: user.id },
+            include: { images: true }
         })
-
-        if (!post) {
-            throw new ResponseError(404, "Post not found or unauthorized")
-        }
-
-        post.images.forEach(image => {
-            removeFile(image.imageUrl)
-        })
-
-        await prismaClient.post.delete({
-            where: { id: postId }
-        })
-
+        if (!post) throw new ResponseError(404, "Post not found or unauthorized")
+        post.images.forEach(image => removeFile(image.imageUrl))
+        await prismaClient.post.delete({ where: { id: postId } })
         return "Post deleted successfully"
     }
 
     static async toggleLike(user: UserJWTPayload, postId: number) {
-        const postExists = await prismaClient.post.count({
-            where: { id: postId }
-        })
-        
-        if (postExists === 0) {
-            throw new ResponseError(404, "Post not found")
-        }
-
+        const postExists = await prismaClient.post.count({ where: { id: postId } })
+        if (postExists === 0) throw new ResponseError(404, "Post not found")
         const existingLike = await prismaClient.like.findUnique({
-            where: {
-                userId_postId: {
-                    userId: user.id,
-                    postId: postId
-                }
-            }
+            where: { userId_postId: { userId: user.id, postId: postId } }
         })
-
         if (existingLike) {
             await prismaClient.like.delete({
-                where: {
-                    userId_postId: {
-                        userId: user.id,
-                        postId: postId
-                    }
-                }
+                where: { userId_postId: { userId: user.id, postId: postId } }
             })
             return "Unliked"
         } else {
             await prismaClient.like.create({
-                data: {
-                    userId: user.id,
-                    postId: postId
-                }
+                data: { userId: user.id, postId: postId }
             })
             return "Liked"
         }

@@ -4,6 +4,7 @@ import { InterestController } from "../controllers/interest-controller"
 import { PostController } from "../controllers/post-controller";
 import { fileUploadMiddleware } from "../middlewares/file-middleware";
 import { UserController } from "../controllers/user-controller";
+import { CommentController } from "../controllers/comment-controller";
 
 export const privateRouter = express.Router();
 privateRouter.use(authMiddleware);
@@ -19,3 +20,5 @@ privateRouter.get("/posts", PostController.list);
 privateRouter.put("/posts/:postId", PostController.update);
 privateRouter.delete("/posts/:postId", PostController.delete);
 privateRouter.post("/posts/:postId/like", PostController.toggleLike);
+privateRouter.post('/posts/:postId/comments', authMiddleware, CommentController.create);
+privateRouter.get('/posts/:postId/comments', authMiddleware, CommentController.listByPost);

@@ -6,6 +6,7 @@ import { fileUploadMiddleware } from "../middlewares/file-middleware";
 import { UserController } from "../controllers/user-controller";
 import { CommentController } from "../controllers/comment-controller";
 import { profileImageMiddleware } from "../middlewares/file-middleware";
+import { ChatController } from "../controllers/chat-controller";
 
 export const privateRouter = express.Router();
 privateRouter.use(authMiddleware);
@@ -25,3 +26,5 @@ privateRouter.delete("/posts/:postId", PostController.delete);
 privateRouter.post("/posts/:postId/like", PostController.toggleLike);
 privateRouter.post('/posts/:postId/comments', authMiddleware, CommentController.create);
 privateRouter.get('/posts/:postId/comments', authMiddleware, CommentController.listByPost);
+
+privateRouter.post("/chat/:chatId/messages", fileUploadMiddleware.array("images"), ChatController.sendMessage);

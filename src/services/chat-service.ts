@@ -65,4 +65,18 @@ export class ChatService {
 
         return messages;
     }
+
+    static async isUserInChat(userId: number, chatId: number) {
+        const chat = await prismaClient.chat.findFirst({
+            where: {
+                id: chatId,
+                OR: [
+                    { user1Id: userId },
+                    { user2Id: userId }
+                ]
+            }
+        });
+
+        return Boolean(chat);
+    }
 }

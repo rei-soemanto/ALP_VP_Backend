@@ -119,3 +119,40 @@ model Comment {
 
   @@map("comments")
 }
+
+model Chat {
+  id        Int     @id @default(autoincrement())
+
+  user1Id   Int
+  user2Id   Int
+
+  user1     User    @relation("ChatUser1", fields: [user1Id], references: [id])
+  user2     User    @relation("ChatUser2", fields: [user2Id], references: [id])
+
+  messages  Message[]
+
+  @@unique([user1Id, user2Id])
+}
+
+model Message {
+  id            Int          @id @default(autoincrement())
+
+  chatId        Int
+  senderId      Int?
+  messageTypeId Int
+
+  content       String
+  read          Boolean      @default(false)
+  timestamp     DateTime     @default(now())
+
+  chat          Chat         @relation(fields: [chatId], references: [id])
+  sender        User?        @relation(fields: [senderId], references: [id])
+  messageType   MessageType  @relation(fields: [messageTypeId], references: [id])
+}
+
+model MessageType {
+  id       Int       @id @default(autoincrement())
+  type     String    @unique
+
+  messages Message[]
+}

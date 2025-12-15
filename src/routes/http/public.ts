@@ -1,6 +1,6 @@
 import express from 'express';
-import { UserController } from '../controllers/user-controller';
-import { InterestController } from '../controllers/interest-controller';
+import { UserController } from '../../controllers/user-controller';
+import { InterestController } from '../../controllers/interest-controller';
 
 export const publicRouter = express.Router();
 

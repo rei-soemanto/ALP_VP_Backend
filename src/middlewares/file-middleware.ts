@@ -2,6 +2,7 @@ import multer from "multer"
 import path from "path"
 import { v4 as uuidv4 } from "uuid"
 import fs from "fs"
+import { ResponseError } from "../error/response-error"
 
 const uploadDir = "images/posts"
 if (!fs.existsSync(uploadDir)) {
@@ -28,7 +29,7 @@ export const fileUploadMiddleware = multer({
         if (file.mimetype.startsWith("image/")) {
             cb(null, true)
         } else {
-            cb(new Error("Only images are allowed"))
+            cb(new ResponseError(400, "Only images are allowed"))
         }
     },
 })
@@ -58,7 +59,7 @@ export const profileImageMiddleware = multer({
         if (file.mimetype.startsWith("image/")) {
             cb(null, true)
         } else {
-            cb(new Error("Only images are allowed"))
+            cb(new ResponseError(400, "Only images are allowed"))
         }
     },
 })

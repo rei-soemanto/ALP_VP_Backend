@@ -22,10 +22,10 @@ export class ChatController {
     static async readMessages(req: UserRequest, res: Response, next: NextFunction) {
         try {
             const requestData = req.body as ListMessageRequest;
-            const response = await ChatService.readMessages(req.user!, parseInt(req.params.receiverId), requestData);
+            const messages = await ChatService.readMessages(req.user!, parseInt(req.params.receiverId), requestData);
             
             res.status(200).json({
-                data: response,
+                data: messages,
             });
         } catch (error) {
             next(error);
@@ -34,7 +34,11 @@ export class ChatController {
 
     static async getChatList(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const response = await ChatService.getChatList(req.user!);
+            const chatList = await ChatService.getChatList(req.user!);
+
+            res.status(200).json({
+                data: chatList,
+            });
         } catch (error) {
             next(error);
         }

@@ -7,22 +7,13 @@ import { Validation } from "../validations/validation";
 export class ChatService {
     static async sendMessage(
         user: UserJWTPayload, 
-        request: SendMessageRequest, 
+        receiverId: number,
+        requestData: SendMessageRequest, 
         images: Express.Multer.File[]
     ): Promise<SendMessageResponse> {
         const validatedRequest = Validation.validate(
-            ChatValidation.SEND_MESSAGE, request
+            ChatValidation.SEND_MESSAGE, requestData
         );
-
-        const chat = await prismaClient.chat.findFirstOrThrow({
-            where: {
-                id: validatedRequest.chatId,
-            }
-        });
-
-        if (chat.user1Id !== user.id && chat.user2Id !== user.id) {
-            throw new Error("User not part of the chat");
-        }
 
         const imageRecords = images.map((file) => ({
             imageUrl: `/images/chat-messages/${file.filename}`,
@@ -30,10 +21,11 @@ export class ChatService {
 
         const message = await prismaClient.message.create({
             data: {
-                chatId: validatedRequest.chatId,
+                receiverId,
                 senderId: user.id,
                 content: validatedRequest.content,
-                images: { create: imageRecords }
+                images: { create: imageRecords },
+                
             },
             include: { 
                 images: true,
@@ -46,37 +38,42 @@ export class ChatService {
         };
     }
 
-    static async listMessages(user: UserJWTPayload, request: ListMessageRequest): Promise<any> {
+    static async readMessages(user: UserJWTPayload, receiverId: number, request: ListMessageRequest): Promise<any> {
         const validatedRequest = Validation.validate(
             ChatValidation.LIST_MESSAGES, request
         );
 
         const messages = await prismaClient.message.findMany({
-            where: {
-                chatId: validatedRequest.chatId
-            },
-            skip: validatedRequest.chunkIndex * 10,
-            take: 10,
+            where: { 
+                OR: [
+                    { senderId: user.id, receiverId: receiverId },
+                    { senderId: receiverId, receiverId: user.id }
+                ]
+             },
+            skip: validatedRequest.chunkIndex * 20,
+            take: 20,
             include: {
                 images: true,
                 sender: true
             }
         });
 
-        return messages;
-    }
-
-    static async isUserInChat(userId: number, chatId: number) {
-        const chat = await prismaClient.chat.findFirst({
-            where: {
-                id: chatId,
-                OR: [
-                    { user1Id: userId },
-                    { user2Id: userId }
-                ]
+        await prismaClient.message.updateMany({
+            where: { receiverId, senderId: user.id, read: false },
+            data: {
+                read: true,
             }
         });
 
-        return Boolean(chat);
+        return messages.map(msg => ({
+            id: msg.id,
+            senderId: msg.senderId,
+            receiverId: msg.receiverId,
+            content: msg.content,
+            timestamp: msg.timestamp,
+            images: msg.images.map(img => img.imageUrl),
+        }));
     }
+
+    
 }

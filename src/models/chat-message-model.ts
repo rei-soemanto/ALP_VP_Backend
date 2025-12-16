@@ -7,14 +7,13 @@ export interface SendMessageRequest {
 
 export interface SendMessageResponse {
     id: number;
-    chatId: number;
     senderId: number;
+    receiverId: number;
     content: string;
     timestamp: Date;
     images: string[];
 }
 
 export interface ListMessageRequest {
-    chatId: number;
     chunkIndex: number;
 }

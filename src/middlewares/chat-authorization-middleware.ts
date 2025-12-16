@@ -9,11 +9,22 @@ export const chatAuthorizationMiddleware = async (
     next: NextFunction
 ) => {
     try {
-        if (await ChatService.isUserInChat(req.user!.id, parseInt(req.params.chatId))) {
-            next();
-        } else {
-            next(new ResponseError(401, "Unauthorized user!"))
-        }
+        // const chatExists = await ChatService.chatExists(
+        //     parseInt(req.params.chatId)
+        // );
+
+        // if (chatExists) {
+        //     const isUserInChat = await ChatService.isUserInChat(
+        //         req.user!.id,
+        //         parseInt(req.params.chatId)
+        //     );
+
+        //     if (!isUserInChat) {
+        //         next(new ResponseError(401, "Unauthorized user!"))
+        //     }
+        // }
+
+        next();
     } catch (error) {
         next(error)
     }

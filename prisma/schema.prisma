@@ -30,9 +30,8 @@ model User {
   following Follower[]     @relation("UserFollowing")
   followers Follower[]     @relation("UserFollowers")
 
-  chatsAsUser1 Chat[]    @relation("ChatUser1")
-  chatsAsUser2 Chat[]    @relation("ChatUser2")
-  Message      Message[]
+  sentMessages     Message[] @relation("MessageSender")
+  receivedMessages Message[] @relation("MessageReceiver")
 
   @@map("users")
 }
@@ -124,31 +123,16 @@ model Comment {
   @@map("comments")
 }
 
-model Chat {
-  id Int @id @default(autoincrement())
-
-  user1Id Int @map("user_id_1")
-  user2Id Int @map("user_id_2")
-
-  user1 User @relation("ChatUser1", fields: [user1Id], references: [id])
-  user2 User @relation("ChatUser2", fields: [user2Id], references: [id])
-
-  messages Message[]
-
-  @@unique([user1Id, user2Id])
-  @@map("chats")
-}
-
 model Message {
-  id        Int      @id @default(autoincrement())
-  chatId    Int      @map("chat_id")
-  senderId  Int      @map("sender_id")
-  content   String   @db.Text
-  read      Boolean  @default(false)
-  timestamp DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  senderId   Int      @map("sender_id")
+  receiverId Int      @map("receiver_id")
+  content    String   @db.Text
+  read       Boolean  @default(false)
+  timestamp  DateTime @default(now())
 
-  chat   Chat  @relation(fields: [chatId], references: [id])
-  sender User? @relation(fields: [senderId], references: [id])
+  sender   User @relation("MessageSender", fields: [senderId], references: [id])
+  receiver User @relation("MessageReceiver", fields: [receiverId], references: [id])
 
   images MessageImage[] // <-- back-relation
 

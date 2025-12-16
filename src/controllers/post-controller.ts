@@ -3,6 +3,7 @@ import { UserRequest } from "../models/user-request-model"
 import { CreatePostRequest } from "../models/post-model"
 import { UpdatePostRequest } from "../models/post-model"
 import { PostService } from "../services/post-service"
+import { ResponseError } from "../error/response-error"
 
 export class PostController {
     static async create(req: UserRequest, res: Response, next: NextFunction) {
@@ -16,7 +17,7 @@ export class PostController {
                 data: response,
             })
         } catch (error) {
-            next(error)
+            next(new ResponseError(400, "Bad Request!"))
         }
     }
 
@@ -24,7 +25,7 @@ export class PostController {
         try {
             const response = await PostService.listMine(req.user!)
             res.status(200).json({ data: response })
-        } catch (error) { next(error) }
+        } catch (error) { next(new ResponseError(400, "Bad Request!")) }
     }
 
     static async list(req: UserRequest, res: Response, next: NextFunction) {
@@ -34,7 +35,7 @@ export class PostController {
                 data: response,
             })
         } catch (error) {
-            next(error)
+            next(new ResponseError(400, "Bad Request!"))
         }
     }
 
@@ -49,7 +50,7 @@ export class PostController {
                 data: response
             })
         } catch (error) {
-            next(error)
+            next(new ResponseError(400, "Bad Request!"))
         }
     }
 
@@ -59,7 +60,7 @@ export class PostController {
             const response = await PostService.delete(req.user!, postId)
             res.status(200).json({ data: response })
         } catch (error) {
-            next(error)
+            next(new ResponseError(400, "Bad Request!"))
         }
     }
 
@@ -69,7 +70,7 @@ export class PostController {
             const response = await PostService.toggleLike(req.user!, postId)
             res.status(200).json({ data: response })
         } catch (error) {
-            next(error)
+            next(new ResponseError(400, "Bad Request!"))
         }
     }
 }

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express"
 import { InterestService } from "../services/interest-service"
 import { AddUserInterestRequest } from "../models/interest-model"
 import { UserRequest } from "../models/user-request-model"
+import { ResponseError } from "../error/response-error"
 
 export class InterestController {
     
@@ -12,7 +13,7 @@ export class InterestController {
                 data: response
             })
         } catch (error) {
-            next(error)
+            next(new ResponseError(400, "Bad Request!"))
         }
     }
 
@@ -25,7 +26,7 @@ export class InterestController {
                 data: "OK"
             })
         } catch (error) {
-            next(error)
+            next(new ResponseError(400, "Bad Request!"))
         }
     }
 }

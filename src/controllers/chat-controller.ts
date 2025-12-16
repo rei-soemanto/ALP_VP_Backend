@@ -15,7 +15,7 @@ export class ChatController {
                 data: response,
             })
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"));
+            next(error);
         }
     }
 
@@ -28,7 +28,7 @@ export class ChatController {
                 data: response,
             });
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"));
+            next(error);
         }
     }
 
@@ -36,7 +36,7 @@ export class ChatController {
         try {
             const response = await ChatService.getChatList(req.user!);
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"));
+            next(error);
         }
     }
 }

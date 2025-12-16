@@ -14,7 +14,7 @@ export class UserController {
         try {
             const response = await UserService.get(req.user!)
             res.status(200).json({ data: response })
-        } catch (error) { next(new ResponseError(400, "Bad Request!")) }
+        } catch (error) { next(error) }
     }
     
     static async register(req: Request, res: Response, next: NextFunction) {
@@ -26,7 +26,7 @@ export class UserController {
                 data: response,
             })
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"))
+            next(error)
         }
     }
 
@@ -39,7 +39,7 @@ export class UserController {
                 data: response,
             })
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"))
+            next(error)
         }
     }
 
@@ -58,7 +58,7 @@ export class UserController {
                 data: response
             })
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"))
+            next(error)
         }
     }
 }

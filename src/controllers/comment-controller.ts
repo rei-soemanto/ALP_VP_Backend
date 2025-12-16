@@ -17,7 +17,7 @@ export class CommentController {
                 data: response
             });
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"))
+            next(error)
         }
     }
 
@@ -30,7 +30,7 @@ export class CommentController {
                 data: response
             });
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"))
+            next(error)
         }
     }
 }

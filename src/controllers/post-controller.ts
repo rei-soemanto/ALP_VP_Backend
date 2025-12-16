@@ -17,7 +17,7 @@ export class PostController {
                 data: response,
             })
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"))
+            next(error)
         }
     }
 
@@ -25,7 +25,7 @@ export class PostController {
         try {
             const response = await PostService.listMine(req.user!)
             res.status(200).json({ data: response })
-        } catch (error) { next(new ResponseError(400, "Bad Request!")) }
+        } catch (error) { next(error) }
     }
 
     static async list(req: UserRequest, res: Response, next: NextFunction) {
@@ -35,7 +35,7 @@ export class PostController {
                 data: response,
             })
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"))
+            next(error)
         }
     }
 
@@ -50,7 +50,7 @@ export class PostController {
                 data: response
             })
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"))
+            next(error)
         }
     }
 
@@ -60,7 +60,7 @@ export class PostController {
             const response = await PostService.delete(req.user!, postId)
             res.status(200).json({ data: response })
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"))
+            next(error)
         }
     }
 
@@ -70,7 +70,7 @@ export class PostController {
             const response = await PostService.toggleLike(req.user!, postId)
             res.status(200).json({ data: response })
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"))
+            next(error)
         }
     }
 }

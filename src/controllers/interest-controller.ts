@@ -13,7 +13,7 @@ export class InterestController {
                 data: response
             })
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"))
+            next(error)
         }
     }
 
@@ -26,7 +26,7 @@ export class InterestController {
                 data: "OK"
             })
         } catch (error) {
-            next(new ResponseError(400, "Bad Request!"))
+            next(error)
         }
     }
 }

@@ -74,4 +74,8 @@ export class ChatService {
             images: msg.images.map(img => img.imageUrl),
         }));
     }
+
+    static async getChatList(user: UserJWTPayload): Promise<any> {
+        
+    }
 }

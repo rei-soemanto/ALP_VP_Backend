@@ -74,6 +74,4 @@ export class ChatService {
             images: msg.images.map(img => img.imageUrl),
         }));
     }
-
-    
 }

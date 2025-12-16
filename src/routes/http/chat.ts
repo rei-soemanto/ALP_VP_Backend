@@ -8,5 +8,7 @@ export const chatRoutes = express.Router();
 // For /chats/:chatId routes
 // chatRoutes.use(chatAuthorizationMiddleware as unknown as express.RequestHandler);
 
+chatRoutes.get('/chatlist', ChatController.getChatList);
+
 chatRoutes.get('/chat/:receiverId/messages', ChatController.readMessages);
 chatRoutes.post("/chat/:receiverId/messages", fileUploadMiddleware.array("images"), ChatController.sendMessage);

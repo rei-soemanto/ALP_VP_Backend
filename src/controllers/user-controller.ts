@@ -7,13 +7,14 @@ import {
 } from "../models/user-model"
 import { UserService } from "../services/user-service"
 import { UserRequest } from "../models/user-request-model"
+import { ResponseError } from "../error/response-error"
 
 export class UserController {
     static async get(req: UserRequest, res: Response, next: NextFunction) {
         try {
             const response = await UserService.get(req.user!)
             res.status(200).json({ data: response })
-        } catch (error) { next(error) }
+        } catch (error) { next(new ResponseError(400, "Bad Request!")) }
     }
     
     static async register(req: Request, res: Response, next: NextFunction) {
@@ -25,7 +26,7 @@ export class UserController {
                 data: response,
             })
         } catch (error) {
-            next(error)
+            next(new ResponseError(400, "Bad Request!"))
         }
     }
 
@@ -38,7 +39,7 @@ export class UserController {
                 data: response,
             })
         } catch (error) {
-            next(error)
+            next(new ResponseError(400, "Bad Request!"))
         }
     }
 
@@ -57,7 +58,7 @@ export class UserController {
                 data: response
             })
         } catch (error) {
-            next(error)
+            next(new ResponseError(400, "Bad Request!"))
         }
     }
 }

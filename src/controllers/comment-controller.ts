@@ -2,6 +2,7 @@ import { Response, NextFunction } from "express";
 import { UserRequest } from "../models/user-request-model";
 import { CreateCommentRequest } from "../models/comment-model";
 import { CommentService } from "../services/comment-service";
+import { ResponseError } from "../error/response-error";
 
 export class CommentController {
     
@@ -16,7 +17,7 @@ export class CommentController {
                 data: response
             });
         } catch (error) {
-            next(error);
+            next(new ResponseError(400, "Bad Request!"))
         }
     }
 
@@ -29,7 +30,7 @@ export class CommentController {
                 data: response
             });
         } catch (error) {
-            next(error);
+            next(new ResponseError(400, "Bad Request!"))
         }
     }
 }

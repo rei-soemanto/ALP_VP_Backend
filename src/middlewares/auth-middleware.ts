@@ -11,9 +11,6 @@ export const authMiddleware = (
     try {
         const authHeader = req.headers["authorization"]
         const token = authHeader && authHeader.split(" ")[1]
-
-        console.log(token);
-
         if (!token) {
             next(new ResponseError(401, "Unauthorized user!"))
             return

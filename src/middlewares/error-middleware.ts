@@ -6,6 +6,8 @@ import { ResponseError } from '../error/response-error';
 export const errorMiddleware = (err: any, req: Request, res: Response, next: NextFunction) => {
     let responseError: ResponseError;
 
+    console.log(err);
+
     if (err instanceof ResponseError) {
         responseError = err;
     } else if (err instanceof Prisma.PrismaClientKnownRequestError) { // Generic Prisma Errors

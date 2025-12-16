@@ -6,6 +6,8 @@ import { ResponseError } from '../error/response-error';
 export const errorMiddleware = (err: any, req: Request, res: Response, next: NextFunction) => {
     let responseError: ResponseError;
 
+    console.log(err);
+
     if (err instanceof ResponseError) {
         responseError = err;
     } else if (err instanceof Prisma.PrismaClientKnownRequestError) { // Generic Prisma Errors
@@ -29,17 +31,17 @@ export const errorMiddleware = (err: any, req: Request, res: Response, next: Nex
         let message;
 
         switch (issue.code) {
-        case 'invalid_type':
-            message = `\"${field}\" must be of type ${issue.expected}.`;
-            break;
+            case 'invalid_type':
+                message = `\"${field}\" must be of type ${issue.expected}.`;
+                break;
 
-        case 'invalid_format':
-            message = `\"${field}\" is not in the correct format.`;
-            break;
+            case 'invalid_format':
+                message = `\"${field}\" is not in the correct format.`;
+                break;
 
-        default:
-            message = issue.message;
-            break;
+            default:
+                message = issue.message;
+                break;
         }
 
         responseError = new ResponseError(400, message);

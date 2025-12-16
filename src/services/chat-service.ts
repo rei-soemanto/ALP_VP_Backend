@@ -1,4 +1,5 @@
 import { Message } from "../../generated/prisma";
+import { io } from "../main";
 import { ListMessageRequest, SendMessageRequest, SendMessageResponse } from "../models/chat-message-model";
 import { UserJWTPayload } from "../models/user-model";
 import { prismaClient } from "../utils/database-util";
@@ -33,10 +34,13 @@ export class ChatService {
             }
         });
 
-        return {
+        const payload = {
             ...message,
             images: message.images.map(img => img.imageUrl)
         };
+
+        io.to(`user:${receiverId}`).emit("message", payload);
+        return payload;
     }
 
     static async readMessages(user: UserJWTPayload, receiverId: number, request: ListMessageRequest): Promise<any> {

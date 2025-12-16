@@ -1,3 +1,4 @@
+import { Message } from "../../generated/prisma";
 import { ListMessageRequest, SendMessageRequest, SendMessageResponse } from "../models/chat-message-model";
 import { UserJWTPayload } from "../models/user-model";
 import { prismaClient } from "../utils/database-util";
@@ -76,6 +77,32 @@ export class ChatService {
     }
 
     static async getChatList(user: UserJWTPayload): Promise<any> {
-        
-    }
+        const messages = await prismaClient.message.findMany({
+            where: {
+                OR: [
+                    { senderId: user.id },
+                    { receiverId: user.id }
+                ]
+            },
+            include: {
+                sender: true,
+                receiver: true
+            },
+            orderBy: {
+                timestamp: 'desc',
+            },
+        });
+
+        const chats = new Map<number, Message>();
+
+        for (const msg of messages) {
+            const otherUserId = msg.senderId === user.id ? msg.receiverId : msg.senderId;
+
+            if (!chats.has(otherUserId)) {
+                chats.set(otherUserId, msg);
+            }
+        }
+
+        return Array.from(chats.values());
+    }   
 }

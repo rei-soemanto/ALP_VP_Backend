@@ -136,6 +136,8 @@ model Message {
 
   images MessageImage[] // <-- back-relation
 
+  @@index([senderId, timestamp])
+  @@index([receiverId, timestamp])
   @@map("messages")
 }
 

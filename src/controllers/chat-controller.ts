@@ -9,7 +9,7 @@ export class ChatController {
         try {
             const request = req.body as SendMessageRequest;
             const images = req.files as Express.Multer.File[]
-            const response = await ChatService.sendMessage(req.user!, parseInt(req.params.receiverId), request, images)
+            const response = await ChatService.sendMessage(req.user!, parseInt(req.params.counterPartId), request, images)
 
             res.status(200).json({
                 data: response,
@@ -22,7 +22,7 @@ export class ChatController {
     static async readMessages(req: UserRequest, res: Response, next: NextFunction) {
         try {
             const requestData = req.body as ListMessageRequest;
-            const messages = await ChatService.readMessages(req.user!, parseInt(req.params.receiverId), requestData);
+            const messages = await ChatService.readMessages(req.user!, parseInt(req.params.counterPartId), requestData);
             
             res.status(200).json({
                 data: messages,

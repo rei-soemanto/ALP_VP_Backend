@@ -10,7 +10,7 @@ import { Validation } from "../validations/validation";
 export class ChatService {
     static async sendMessage(
         user: UserJWTPayload, 
-        receiverId: number,
+        counterPartId: number,
         requestData: SendMessageRequest, 
         images: Express.Multer.File[]
     ): Promise<SendMessageResponse> {
@@ -24,7 +24,7 @@ export class ChatService {
 
         const message = await prismaClient.message.create({
             data: {
-                receiverId,
+                receiverId: counterPartId,
                 senderId: user.id,
                 content: validatedRequest.content,
                 images: { create: imageRecords },
@@ -40,11 +40,11 @@ export class ChatService {
             images: message.images.map(img => img.imageUrl)
         };
 
-        io.to(`user:${receiverId}`).emit("message", payload);
+        io.to(`user:${counterPartId}`).emit("message", payload);
         return payload;
     }
 
-    static async readMessages(user: UserJWTPayload, receiverId: number, request: ListMessageRequest): Promise<any> {
+    static async readMessages(user: UserJWTPayload, counterPartId: number, request: ListMessageRequest): Promise<any> {
         const validatedRequest = Validation.validate(
             ChatValidation.LIST_MESSAGES, request
         );
@@ -52,10 +52,10 @@ export class ChatService {
         const messages = await prismaClient.message.findMany({
             where: { 
                 OR: [
-                    { senderId: user.id, receiverId: receiverId },
-                    { senderId: receiverId, receiverId: user.id }
+                    { senderId: user.id, receiverId: counterPartId },
+                    { senderId: counterPartId, receiverId: user.id }
                 ]
-             },
+            }, 
             skip: validatedRequest.chunkIndex * 20,
             take: 20,
             include: {
@@ -65,12 +65,13 @@ export class ChatService {
         });
 
         await prismaClient.message.updateMany({
-            where: { receiverId, senderId: user.id, read: false },
+            where: { senderId: counterPartId, read: false },
             data: {
                 read: true,
             }
         });
 
+        // io.to(`user:${counterPartId}`).emit("read");
         return messages.map(msg => ({
             id: msg.id,
             senderId: msg.senderId,

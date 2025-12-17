@@ -6,6 +6,7 @@ import { UserJWTPayload } from "../models/user-model";
 import { prismaClient } from "../utils/database-util";
 import { ChatValidation } from "../validations/chat-validation";
 import { Validation } from "../validations/validation";
+import { ResponseError } from "../error/response-error";
 
 export class ChatService {
     static async sendMessage(
@@ -45,6 +46,10 @@ export class ChatService {
     }
 
     static async readMessages(user: UserJWTPayload, counterPartId: number, request: ListMessageRequest): Promise<any> {
+        if (user.id === counterPartId) {
+            throw new ResponseError(400, "Cannot read messages with yourself");
+        }
+
         const validatedRequest = Validation.validate(
             ChatValidation.LIST_MESSAGES, request
         );
@@ -56,7 +61,7 @@ export class ChatService {
                     { senderId: counterPartId, receiverId: user.id }
                 ]
             }, 
-            skip: validatedRequest.chunkIndex * 20,
+            skip: (validatedRequest.chunkIndex - 1) * 20,
             take: 20,
             include: {
                 images: true,

@@ -5,16 +5,11 @@ import { PORT } from "./utils/env-util";
 import { errorMiddleware } from "./middlewares/error-middleware";
 import { httpAPIRouter } from "./routes/http/http-api";
 import { socketAuthMiddleware } from "./middlewares/auth-middleware.socket";
-// import { ioSessionStore } from "./session-store/io-session-store";
 import { socketAPIRouter } from "./routes/socket/socket-api";
 
 export const app = express()
 
 app.use(express.json())
-// app.use((req, res, next) => {
-//     console.log(req);
-//     next();
-// });
 app.use("/api", httpAPIRouter);
 app.use(errorMiddleware)
 app.use("/images", express.static("images"))
@@ -24,8 +19,7 @@ const server = http.createServer(app);
 export const io = new IOServer(server, {
     cors: {
         origin: "*",
-    },
-    path: '/api'
+    }
 });
 
 io.use(socketAuthMiddleware);

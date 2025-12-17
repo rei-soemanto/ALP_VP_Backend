@@ -1,3 +1,4 @@
+import { read } from "fs";
 import { Message } from "../../generated/prisma";
 import { io } from "../main";
 import { ListMessageRequest, SendMessageRequest, SendMessageResponse } from "../models/chat-message-model";
@@ -107,6 +108,16 @@ export class ChatService {
             }
         }
 
-        return Array.from(chats.values());
+        return Array.from(chats.values()).map((msg: any) => ({
+            id: msg.id,
+            content: msg.content,
+            sentByYou: msg.senderId === user.id,
+            read: msg.read,
+            chatProfile: {
+                id: msg.senderId === user.id ? msg.receiver.id : msg.sender.id,
+                fullName: msg.senderId === user.id ? msg.receiver.fullName : msg.sender.fullName,
+                avatarUrl: msg.senderId === user.id ? msg.receiver.avatarUrl : msg.sender.avatarUrl,
+            }
+        }))
     }   
 }

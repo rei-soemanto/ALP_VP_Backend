@@ -10,5 +10,7 @@ export const chatRoutes = express.Router();
 
 chatRoutes.get('/list', ChatController.getChatList);
 
-chatRoutes.post('/chat/:counterPartId/messages', ChatController.readMessages);
-chatRoutes.post("/chat/:counterPartId/messages", fileUploadMiddleware.array("images"), ChatController.sendMessage);
+chatRoutes.get('/:counterPartId/messages', ChatController.readMessages);
+chatRoutes.post("/:counterPartId/messages", fileUploadMiddleware.array("images"), ChatController.sendMessage);
+
+chatRoutes.get('/:counterPartId/images', ChatController.getImages);

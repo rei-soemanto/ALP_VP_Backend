@@ -8,4 +8,7 @@ export class ChatValidation {
     static readonly LIST_MESSAGES: ZodType<any> = z.object({
         chunkIndex: z.int().positive()
     });
+
+    static readonly USER_ID_PARAM = z.int().positive();
+
 }

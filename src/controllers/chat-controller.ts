@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { UserRequest } from "../models/user-request-model";
 import { ChatService } from "../services/chat-service";
-import { ListMessageRequest, SendMessageRequest } from "../models/chat-message-model";
+import { SendMessageRequest } from "../models/chat-message-model";
 import { ResponseError } from "../error/response-error";
 
 export class ChatController {
@@ -21,11 +21,22 @@ export class ChatController {
 
     static async readMessages(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const requestData = req.body as ListMessageRequest;
-            const messages = await ChatService.readMessages(req.user!, parseInt(req.params.counterPartId), requestData);
-            
+            const messages = await ChatService.readMessages(req.user!, Number(req.params.counterPartId));
+
             res.status(200).json({
                 data: messages,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getImages(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const images = await ChatService.getImages(req.user!, Number(req.params.counterPartId), Number(req.query.messageId));
+
+            res.status(200).json({
+                data: images,
             });
         } catch (error) {
             next(error);

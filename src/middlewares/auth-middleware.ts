@@ -17,6 +17,7 @@ export const authMiddleware = (
         }
 
         const payload = verifyToken(token!)
+        console.log(payload);
 
         if (payload) {
             req.user = payload
@@ -27,6 +28,7 @@ export const authMiddleware = (
 
         next()
     } catch (error) {
+        // console.log(error);
         next(error)
     }
 }

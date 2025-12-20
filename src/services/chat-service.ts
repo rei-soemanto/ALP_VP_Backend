@@ -45,14 +45,14 @@ export class ChatService {
         return payload;
     }
 
-    static async readMessages(user: UserJWTPayload, counterPartId: number, request: ListMessageRequest): Promise<any> {
+    static async readMessages(user: UserJWTPayload, counterPartId: number): Promise<any> {
         if (user.id === counterPartId) {
             throw new ResponseError(400, "Cannot read messages with yourself");
         }
 
-        const validatedRequest = Validation.validate(
-            ChatValidation.LIST_MESSAGES, request
-        );
+        if (!ChatValidation.USER_ID_PARAM.safeParse(counterPartId).success) {
+            throw new ResponseError(400, "Invalid counterPartId parameter");
+        }
 
         const messages = await prismaClient.message.findMany({
             where: { 
@@ -61,8 +61,6 @@ export class ChatService {
                     { senderId: counterPartId, receiverId: user.id }
                 ]
             }, 
-            skip: (validatedRequest.chunkIndex - 1) * 20,
-            take: 20,
             include: {
                 images: true,
                 sender: true
@@ -76,7 +74,7 @@ export class ChatService {
             }
         });
 
-        // io.to(`user:${counterPartId}`).emit("read");
+        io.to(`user:${counterPartId}`).emit("read");
         return messages.map(msg => ({
             id: msg.id,
             senderId: msg.senderId,
@@ -84,7 +82,25 @@ export class ChatService {
             content: msg.content,
             timestamp: msg.timestamp,
             images: msg.images.map(img => img.imageUrl),
+            read: msg.read
         }));
+    }
+
+    static async getImages(user: UserJWTPayload, counterPartId: number, messageId: number): Promise<string[]> {
+        const message = await prismaClient.message.findFirst({
+            where: {
+                id: messageId,
+                OR: [
+                    { senderId: user.id, receiverId: counterPartId },
+                    { senderId: counterPartId, receiverId: user.id }
+                ]
+            },
+            include: {
+                images: true
+            }
+        });
+
+        return message?.images.map(img => img.imageUrl) || [];
     }
 
     static async getChatList(user: UserJWTPayload): Promise<any> {

@@ -1,9 +1,10 @@
 // import { ioSessionStore } from "../session-store/io-session-store";
+import { Socket } from "socket.io";
 import { verifyToken } from "../utils/jwt-util";
 
 export const socketAuthMiddleware = (socket: any, next: any) => {
   try {
-    const user = verifyToken(socket.handshake.auth.token);
+    const user = verifyToken((socket.handshake.query.token as string).replace('Bearer ', ''));
     socket.userId = user.id;
 
     if (!user) {
@@ -13,7 +14,8 @@ export const socketAuthMiddleware = (socket: any, next: any) => {
 
     // ioSessionStore.set(user.id, socket);
     next();
-  } catch {
+  } catch (e) {
+    console.log(e);
     next(new Error("Unauthorized user!"));
   }
 }

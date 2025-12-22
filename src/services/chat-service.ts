@@ -7,6 +7,8 @@ import { prismaClient } from "../utils/database-util";
 import { ChatValidation } from "../validations/chat-validation";
 import { Validation } from "../validations/validation";
 import { ResponseError } from "../error/response-error";
+import { validate } from "uuid";
+import { request } from "http";
 
 export class ChatService {
     static async sendMessage(
@@ -41,7 +43,7 @@ export class ChatService {
             images: message.images.map(img => img.imageUrl)
         };
 
-        io.to(`user:${counterPartId}`).emit("message", payload);
+        io.to([`user:${counterPartId}`, `user:${user.id}`]).emit("message", payload);
         return payload;
     }
 
@@ -64,7 +66,10 @@ export class ChatService {
             include: {
                 images: true,
                 sender: true
-            }
+            },
+            orderBy: {
+                timestamp: 'desc',
+            },
         });
 
         await prismaClient.message.updateMany({
@@ -74,7 +79,7 @@ export class ChatService {
             }
         });
 
-        io.to(`user:${counterPartId}`).emit("read");
+        io.to([`user:${counterPartId}`, `user:${user.id}`]).emit("read");
         return messages.map(msg => ({
             id: msg.id,
             senderId: msg.senderId,
@@ -84,6 +89,30 @@ export class ChatService {
             images: msg.images.map(img => img.imageUrl),
             read: msg.read
         }));
+    }
+
+    static async readMessage(user: UserJWTPayload, counterPartId: number, messageId: number): Promise<any> {
+        if (user.id === counterPartId) {
+            throw new ResponseError(400, "Cannot read messages with yourself");
+        }
+
+        if (!ChatValidation.USER_ID_PARAM.safeParse(counterPartId).success) {
+            throw new ResponseError(400, "Invalid counterPartId parameter");
+        }
+
+        if (!ChatValidation.MESSAGE_ID_PARAM.safeParse(messageId).success) {
+            throw new ResponseError(400, "Invalid messageId parameter");
+        }
+
+        const message = await prismaClient.message.update({
+            where: { id: messageId },
+            data: {
+                read: true,
+            }
+        });
+
+        io.to([`user:${counterPartId}`, `user:${user.id}`]).emit("read");
+        return message;
     }
 
     static async getImages(user: UserJWTPayload, counterPartId: number, messageId: number): Promise<string[]> {

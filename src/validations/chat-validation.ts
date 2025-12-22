@@ -10,5 +10,5 @@ export class ChatValidation {
     });
 
     static readonly USER_ID_PARAM = z.int().positive();
-
+    static readonly MESSAGE_ID_PARAM = z.int().positive();
 }

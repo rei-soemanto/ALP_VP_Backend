@@ -1,6 +1,5 @@
 
 export interface SendMessageRequest {
-    chatId: number;
     content: string;
 }
 
@@ -11,6 +10,7 @@ export interface SendMessageResponse {
     content: string;
     timestamp: Date;
     images: string[];
+    read: boolean;
 }
 
 export interface ListMessageRequest {

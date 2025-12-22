@@ -63,3 +63,33 @@ export const profileImageMiddleware = multer({
         }
     },
 })
+
+const chatUploadDir = "images/chat-messages"
+if (!fs.existsSync(chatUploadDir)) {
+    fs.mkdirSync(chatUploadDir, { recursive: true })
+}
+
+const chatMessageStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, chatUploadDir)
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = uuidv4()
+        const ext = path.extname(file.originalname)
+        cb(null, `${uniqueSuffix}${ext}`)
+    },
+})
+
+export const chatImageMiddleware = multer({
+    storage: chatMessageStorage,
+    limits: {
+        fileSize: 5 * 1024 * 1024,
+    },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith("image/")) {
+            cb(null, true)
+        } else {
+            cb(new ResponseError(400, "Only images are allowed"))
+        }
+    },
+})

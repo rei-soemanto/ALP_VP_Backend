@@ -31,6 +31,19 @@ export class ChatController {
         }
     }
 
+    static async readMessage(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const messageId = Number(req.params.messageId);
+            const response = await ChatService.readMessage(req.user!, Number(req.params.counterPartId), messageId);
+
+            res.status(200).json({
+                data: response,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     static async getImages(req: UserRequest, res: Response, next: NextFunction) {
         try {
             const images = await ChatService.getImages(req.user!, Number(req.params.counterPartId), Number(req.query.messageId));

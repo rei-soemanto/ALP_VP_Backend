@@ -17,7 +17,7 @@ export const authMiddleware = (
         }
 
         const payload = verifyToken(token!)
-        console.log(payload);
+        // console.log(payload);
 
         if (payload) {
             req.user = payload

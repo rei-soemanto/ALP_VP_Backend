@@ -43,7 +43,10 @@ export class ChatService {
             images: message.images.map(img => img.imageUrl)
         };
 
-        io.to([`user:${counterPartId}`, `user:${user.id}`]).emit("message", payload);
+        io.to([
+            `user:${counterPartId}:${user.id}`, `user:${user.id}:${counterPartId}`,
+            `user:${counterPartId}:0`, `user:${user.id}:0`
+        ]).emit("message", payload);
         return payload;
     }
 
@@ -79,7 +82,10 @@ export class ChatService {
             }
         });
 
-        io.to([`user:${counterPartId}`, `user:${user.id}`]).emit("read");
+        io.to([
+            `user:${counterPartId}:${user.id}`, `user:${user.id}:${counterPartId}`,
+            `user:${counterPartId}:0`, `user:${user.id}:0`
+        ]).emit("read");
         return messages.map(msg => ({
             id: msg.id,
             senderId: msg.senderId,
@@ -91,37 +97,35 @@ export class ChatService {
         }));
     }
 
-    static async readMessage(user: UserJWTPayload, counterPartId: number, messageId: number): Promise<any> {
-        if (user.id === counterPartId) {
-            throw new ResponseError(400, "Cannot read messages with yourself");
-        }
-
-        if (!ChatValidation.USER_ID_PARAM.safeParse(counterPartId).success) {
-            throw new ResponseError(400, "Invalid counterPartId parameter");
-        }
-
+    static async readMessage(user: UserJWTPayload, messageId: number): Promise<any> { 
         if (!ChatValidation.MESSAGE_ID_PARAM.safeParse(messageId).success) {
             throw new ResponseError(400, "Invalid messageId parameter");
         }
 
+        // Ensure the message exists, counterPart is the sender, and user is the receiver
+        // If not, Prisma will throw a P2025 error which we handle in error middleware
         const message = await prismaClient.message.update({
-            where: { id: messageId },
+            where: { id: messageId, receiverId: user.id },
             data: {
                 read: true,
             }
         });
 
-        io.to([`user:${counterPartId}`, `user:${user.id}`]).emit("read");
+        // User must be a receiver to mark as read, so senderId must be the counterPart
+        io.to([
+            `user:${message.senderId}:${user.id}`, `user:${user.id}:${message.senderId}`,
+            `user:${message.senderId}:0`, `user:${user.id}:0`
+        ]).emit("read");
         return message;
     }
 
-    static async getImages(user: UserJWTPayload, counterPartId: number, messageId: number): Promise<string[]> {
+    static async getImages(user: UserJWTPayload, messageId: number): Promise<string[]> {
         const message = await prismaClient.message.findFirst({
             where: {
                 id: messageId,
                 OR: [
-                    { senderId: user.id, receiverId: counterPartId },
-                    { senderId: counterPartId, receiverId: user.id }
+                    { senderId: user.id },
+                    { receiverId: user.id }
                 ]
             },
             include: {

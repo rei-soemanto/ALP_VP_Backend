@@ -3,6 +3,7 @@ import {
     LoginUserRequest,
     RegisterUserRequest,
     UpdateUserRequest,
+    DeleteUserRequest,
     toUserResponse,
     UserResponse,
     UserJWTPayload,
@@ -123,5 +124,42 @@ export class UserService {
         }
 
         return toUserResponse(userData)
+    }
+
+    static async delete(
+        userPayload: UserJWTPayload, 
+        request: DeleteUserRequest
+    ): Promise<string> {
+        const validatedRequest = Validation.validate(
+            UserValidation.DELETE,
+            request
+        )
+
+        const existingUser = await prismaClient.user.findUnique({
+            where: { id: userPayload.id }
+        })
+
+        if (!existingUser) {
+            throw new ResponseError(404, "User not found")
+        }
+
+        const passwordIsValid = await bcrypt.compare(
+            validatedRequest.password,
+            existingUser.password
+        )
+
+        if (!passwordIsValid) {
+            throw new ResponseError(401, "Invalid password confirmation!")
+        }
+
+        if (existingUser.avatarUrl) {
+            removeFile(existingUser.avatarUrl)
+        }
+
+        await prismaClient.user.delete({
+            where: { id: userPayload.id }
+        })
+
+        return "OK"
     }
 }

@@ -46,4 +46,14 @@ export class UserValidation {
         about: z.string().optional(),
         fullName: z.string().optional()
     })
+
+    static readonly DELETE: ZodType = z.object({
+        password: z
+            .string({
+                error: "Password must be string!",
+            })
+            .min(1, {
+                error: "Password cannot be empty!",
+            }),
+    })
 }

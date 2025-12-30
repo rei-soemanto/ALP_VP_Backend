@@ -10,3 +10,4 @@ userRoutes.get("/current", UserController.get);
 
 userRoutes.use(profileImageMiddleware.single("avatar"));
 userRoutes.patch("/current", UserController.update);
+userRoutes.delete("/current", UserController.delete);

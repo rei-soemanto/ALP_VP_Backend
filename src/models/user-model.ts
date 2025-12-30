@@ -24,6 +24,10 @@ export interface UpdateUserRequest {
     avatarUrl?: string
 }
 
+export interface DeleteUserRequest {
+    password: string
+}
+
 export interface UserResponse {
     token?: string
     id: number

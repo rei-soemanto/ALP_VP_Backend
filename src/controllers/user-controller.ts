@@ -3,6 +3,7 @@ import {
     LoginUserRequest,
     RegisterUserRequest,
     UpdateUserRequest,
+    DeleteUserRequest,
     UserResponse,
 } from "../models/user-model"
 import { UserService } from "../services/user-service"
@@ -54,6 +55,19 @@ export class UserController {
 
             const response: UserResponse = await UserService.update(req.user!, request)
 
+            res.status(200).json({
+                data: response
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    static async delete(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const request: DeleteUserRequest = req.body as DeleteUserRequest
+            const response = await UserService.delete(req.user!, request)
+            
             res.status(200).json({
                 data: response
             })
